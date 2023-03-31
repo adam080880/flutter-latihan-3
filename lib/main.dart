@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'ui/product_form.dart';
+import 'package:latihan_3/ui/product_list.dart';
 
 void main() {
   runApp(const MyApp());
@@ -25,7 +25,7 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.amber,
       ),
-      home: const ProductForm(),
+      home: const ProductList(),
     );
   }
 }

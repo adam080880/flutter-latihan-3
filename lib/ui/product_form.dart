@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:latihan_3/formatters/auto_upper_case.dart';
-import 'package:latihan_3/ui/product_detail.dart';
+import 'package:latihan_3/models/product.dart';
+import 'package:provider/provider.dart';
 
 class ProductForm extends StatefulWidget {
-  const ProductForm({Key? key}) : super(key: key);
+  final ProductModel productModel;
+
+  const ProductForm({required this.productModel, Key? key}) : super(key: key);
 
   @override
   _ProductFormState createState() => _ProductFormState();
@@ -18,16 +21,18 @@ class _ProductFormState extends State<ProductForm> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: const Text('Form Produk')),
-        body: SingleChildScrollView(
-            padding: const EdgeInsets.only(left: 16, right: 16, top: 16),
-            child: Column(children: [
-              _renderTextBoxProductCode(),
-              _renderTextBoxProductName(),
-              _renderTextBoxProductPrice(),
-              _renderTextBoxProductStock(),
-              _renderSaveButton()
-            ])));
+    appBar: AppBar(title: const Text('Form Produk')),
+    body: SingleChildScrollView(
+        padding: const EdgeInsets.only(left: 16, right: 16, top: 16),
+        child: Column(children: [
+          _renderTextBoxProductCode(),
+          _renderTextBoxProductName(),
+          _renderTextBoxProductPrice(),
+          _renderTextBoxProductStock(),
+          _renderSaveButton(context),
+        ])
+      ),
+    );
   }
 
   _renderTextBoxProductCode() {
@@ -62,42 +67,42 @@ class _ProductFormState extends State<ProductForm> {
     );
   }
 
-  _renderSaveButton() {
+  _renderSaveButton(context) {
     return ElevatedButton(
-        onPressed: _handleSaveButton, child: const Text('Simpan'));
+        onPressed: _handleSaveButton(context), child: const Text('Simpan'));
   }
 
-  _handleSaveButton() {
-    if (_productCodeController.text.isEmpty ||
-        _productNameController.text.isEmpty ||
-        _productPriceController.text.isEmpty ||
-        _productStockController.text.isEmpty) {
-      AlertDialog alert = AlertDialog(
-          title: const Text('Input tidak valid'),
-          content: const Text('Semuanya wajib diisi'),
-          actions: [
-            TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: const Text('OK'))
-          ]);
+  _handleSaveButton(context) {
+    return () {
+      if (_productCodeController.text.isEmpty ||
+          _productNameController.text.isEmpty ||
+          _productPriceController.text.isEmpty ||
+          _productStockController.text.isEmpty) {
+        AlertDialog alert = AlertDialog(
+            title: const Text('Input tidak valid'),
+            content: const Text('Semuanya wajib diisi'),
+            actions: [
+              TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Text('OK'))
+            ]);
 
-      showDialog(context: context, builder: (BuildContext context) => alert);
+        showDialog(context: context, builder: (BuildContext context) => alert);
 
-      return;
-    }
+        return;
+      }
 
-    String productCode = _productCodeController.text;
-    String productName = _productNameController.text;
-    int productPrice = int.parse(_productPriceController.text);
-    int productStock = int.parse(_productStockController.text);
+      Product newProduct = Product();
+      newProduct.productCode = _productCodeController.text;
+      newProduct.productName = _productNameController.text;
+      newProduct.productPrice = int.parse(_productPriceController.text);
+      newProduct.productStock = int.parse(_productStockController.text);
 
-    Navigator.of(context).push(MaterialPageRoute(
-        builder: (context) => ProductDetail(
-            productCode: productCode,
-            productName: productName,
-            productPrice: productPrice,
-            productStock: productStock,)));
+      widget.productModel.add(newProduct);
+
+      Navigator.of(context).pop();
+    };
   }
 }
