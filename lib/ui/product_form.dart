@@ -114,7 +114,7 @@ class _ProductFormState extends State<ProductForm> {
       });
 
       ProdukModel newProduct = ProdukModel();
-      newProduct.id = widget.product?.id;
+      newProduct.id = widget.product?.id; // kalau proses tambah produk, nilai ini null
       newProduct.kodeproduk = _productCodeController.text;
       newProduct.namaproduk = _productNameController.text;
       newProduct.hargaproduk = int.parse(_productPriceController.text);

@@ -28,10 +28,8 @@ class ProdukBloc {
     };
 
     var response = await Api().post(apiUrl, body);
-
-    print('response');
-    print(response);
     var jsonObj = json.decode(response.body);
+
     return jsonObj['status'];
   }
 
@@ -46,6 +44,7 @@ class ProdukBloc {
 
     var response = await Api().post(apiUrl, body);
     var jsonObj = json.decode(response.body);
+
     return jsonObj['data'];
   }
 
@@ -54,6 +53,7 @@ class ProdukBloc {
 
     var response = await Api().delete(apiUrl);
     var jsonObj = json.decode(response.body);
+
     return (jsonObj as Map<String, dynamic>)['data'];
   }
 }
