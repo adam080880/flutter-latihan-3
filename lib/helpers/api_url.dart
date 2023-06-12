@@ -1,5 +1,5 @@
 class ApiUrl {
-  static const String baseUrl = 'https://6a2e-2001-448a-2040-ac0e-f539-4307-2f3-c913.ngrok-free.app';
+  static const String baseUrl = 'https://39c4-2001-448a-2040-c74a-d93b-e97e-e1c6-adb2.ngrok-free.app';
 
   static const String registrasi = '$baseUrl/registrasi';
   static const String login = '$baseUrl/login';

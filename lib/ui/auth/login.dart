@@ -142,9 +142,7 @@ class _LoginState extends State<Login> {
                   if (!mounted) return;
 
                   // if success
-                  Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) => const ProductList())
-                  );
+                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const ProductList()));
 
                   ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                     backgroundColor: Colors.green,

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:latihan_3/bloc/produk_bloc.dart';
 import 'package:latihan_3/models/data/produk.dart';
+import 'package:latihan_3/ui/auth/login.dart';
 import 'package:latihan_3/ui/product_detail.dart';
 import 'package:latihan_3/ui/product_form.dart';
 import 'package:latihan_3/widgets/ItemProdukCard.dart';
@@ -12,6 +14,28 @@ class ProductList extends StatefulWidget {
 }
 
 class _ProductListState extends State<ProductList> {
+  bool _loading = false;
+  List<ProdukModel> _produks = [];
+
+  @override
+  initState() {
+    super.initState();
+    loadProducts();
+  }
+
+  loadProducts() async {
+    setState(() {
+      _loading = true;
+    });
+
+    List<ProdukModel> newProduks = await ProdukBloc.getProduks();
+
+    setState(() {
+      _loading = false;
+      _produks = newProduks;
+    });
+  }
+
   @override
   Widget build(BuildContext buildContext) {
     return Scaffold(
@@ -23,49 +47,20 @@ class _ProductListState extends State<ProductList> {
               title: const Text('Logout'),
               trailing: const Icon(Icons.logout),
               onTap: () async {
-                Navigator.pop(context);
-                Navigator.pop(context);
+                Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const Login()));
               },
             )
           ],
         ),
       ),
-      body: ListView(
-        children: [
-          ItemProductCard(
-            produk: ProdukModel(
-              id: 1,
-              kodeproduk: 'A001',
-              namaproduk: 'Kamera',
-              hargaproduk: 5000000
-            ),
-            handleNavigateToProdukDetail: (targetProduct) => {
-              handleNavigateToProdukDetail(targetProduct)
-            },
-          ),
-          ItemProductCard(
-            produk: ProdukModel(
-              id: 2,
-              kodeproduk: 'A002',
-              namaproduk: 'Mesin Cuci',
-              hargaproduk: 3500000
-            ),
-            handleNavigateToProdukDetail: (targetProduct) => {
-              handleNavigateToProdukDetail(targetProduct)
-            },
-          ),
-          ItemProductCard(
-            produk: ProdukModel(
-              id: 3,
-              kodeproduk: 'A003',
-              namaproduk: 'Iphone 5',
-              hargaproduk: 1500000
-            ),
-            handleNavigateToProdukDetail: (targetProduct) => {
-              handleNavigateToProdukDetail(targetProduct)
-            },
-          ),
-        ],
+      body: _loading ? const Center(child: CircularProgressIndicator()) : ListView.builder(
+        itemCount: _produks.length,
+        itemBuilder: (context, index) => ItemProductCard(
+          produk: _produks[index],
+          handleNavigateToProdukDetail: (targetProduct) => {
+            handleNavigateToProdukDetail(targetProduct)
+          },
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => {
@@ -78,13 +73,13 @@ class _ProductListState extends State<ProductList> {
 
   handleNavigateToProdukForm(ProdukModel? targetProduk) {
     Navigator.of(context).push(
-      MaterialPageRoute(builder: (context) => ProductForm(product: targetProduk))
+      MaterialPageRoute(builder: (context) => ProductForm(product: targetProduk, loadProducts: loadProducts))
     );
   }
 
   handleNavigateToProdukDetail(ProdukModel targetProduk) {
     Navigator.of(context).push(
-      MaterialPageRoute(builder: (context) => ProductDetail(produk: targetProduk))
+      MaterialPageRoute(builder: (context) => ProductDetail(produk: targetProduk, loadProducts: loadProducts))
     );
   }
 }

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:latihan_3/bloc/produk_bloc.dart';
 import 'package:latihan_3/formatters/auto_upper_case.dart';
 import 'package:latihan_3/models/data/produk.dart';
 class ProductForm extends StatefulWidget {
   final ProdukModel? product;
-  const ProductForm({Key? key, this.product}) : super(key: key);
+  final dynamic loadProducts;
+  const ProductForm({Key? key, this.product, this.loadProducts}) : super(key: key);
 
   @override
   _ProductFormState createState() => _ProductFormState();
@@ -11,6 +13,7 @@ class ProductForm extends StatefulWidget {
 
 class _ProductFormState extends State<ProductForm> {
   final _formKey = GlobalKey<FormState>();
+  bool _loading = false;
   final _productCodeController = TextEditingController();
   final _productNameController = TextEditingController();
   final _productPriceController = TextEditingController();
@@ -19,12 +22,11 @@ class _ProductFormState extends State<ProductForm> {
   void initState() {
     super.initState();
 
-    print(widget.product);
-    print('widget.product');
-
     _productCodeController.text = widget.product?.kodeproduk ?? '';
     _productNameController.text = widget.product?.namaproduk ?? '';
     _productPriceController.text = (widget.product?.hargaproduk?.toString() ?? '');
+
+    _loading = false;
   }
 
   @override
@@ -80,8 +82,8 @@ class _ProductFormState extends State<ProductForm> {
       children: [
         Expanded(
           child: ElevatedButton(
-            onPressed: _handleSaveButton(context),
-            child: const Text('Simpan')
+            onPressed: _loading ? null : _handleSaveButton(context),
+            child: const Text('Simpan'),
           )
         )
       ]
@@ -89,8 +91,8 @@ class _ProductFormState extends State<ProductForm> {
   }
 
   _handleSaveButton(context) {
-    return () {
-      if (_formKey.currentState!.validate()) {
+    return () async {
+      if (!_formKey.currentState!.validate()) {
         AlertDialog alert = AlertDialog(
             title: const Text('Input tidak valid'),
             content: const Text('Semuanya wajib diisi'),
@@ -107,12 +109,46 @@ class _ProductFormState extends State<ProductForm> {
         return;
       }
 
+      setState(() {
+        _loading = true;
+      });
+
       ProdukModel newProduct = ProdukModel();
+      newProduct.id = widget.product?.id;
       newProduct.kodeproduk = _productCodeController.text;
       newProduct.namaproduk = _productNameController.text;
       newProduct.hargaproduk = int.parse(_productPriceController.text);
 
-      Navigator.of(context).pop();
+      try {
+        if (newProduct.id == null) {
+          await ProdukBloc.addProduk(produk: newProduct);
+        } else {
+          await ProdukBloc.updateProduk(produk: newProduct);
+        }
+
+        await widget.loadProducts();
+
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: Colors.green,
+          content: Text("Berhasil ${newProduct.id != null ? 'edit' : 'tambah'} produk"),
+          showCloseIcon: true,
+          closeIconColor: Colors.white,
+        ));
+
+        int count = 0;
+        Navigator.of(context).popUntil((_) => count++ >= (newProduct.id == null ? 1 : 2));
+      } catch (error) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: Colors.red,
+          content: Text(error.toString()),
+          showCloseIcon: true,
+          closeIconColor: Colors.white,
+        ));
+      } finally {
+        setState(() {
+          _loading = false;
+        });
+      }
     };
   }
 }

@@ -1,17 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:latihan_3/bloc/produk_bloc.dart';
 import 'package:latihan_3/models/data/produk.dart';
 import 'package:latihan_3/ui/product_form.dart';
 
 class ProductDetail extends StatefulWidget {
   final ProdukModel produk;
+  final dynamic loadProducts;
 
-  const ProductDetail({Key? key, required this.produk}) : super(key: key);
+  const ProductDetail({Key? key, required this.produk, this.loadProducts}) : super(key: key);
 
   @override
   _ProductDetailState createState() => _ProductDetailState();
 }
 
 class _ProductDetailState extends State<ProductDetail> {
+  bool _loading = false;
+
   @override
   Widget build(BuildContext buildContext) {
     return Scaffold(
@@ -36,7 +40,7 @@ class _ProductDetailState extends State<ProductDetail> {
                     child: const Text('Edit', style: TextStyle(color: Colors.black)),
                     onPressed: () => {
                       Navigator.of(context).push(
-                        MaterialPageRoute(builder: (context) => ProductForm(product: widget.produk))
+                        MaterialPageRoute(builder: (context) => ProductForm(product: widget.produk, loadProducts: widget.loadProducts))
                       )
                     },
                   )
@@ -44,8 +48,37 @@ class _ProductDetailState extends State<ProductDetail> {
                 const Padding(padding: EdgeInsets.only(right: 16)),
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: () => {
-                      Navigator.pop(context)
+                    onPressed: _loading ? null : () async {
+                      setState(() {
+                        _loading = true;
+                      });
+
+                      try {
+                        await ProdukBloc.deleteProduk(id: widget.produk.id);
+                        await widget.loadProducts();
+
+                        // ignore: use_build_context_synchronously
+                        Navigator.pop(context);
+
+                        // ignore: use_build_context_synchronously
+                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                          backgroundColor: Colors.green,
+                          content: Text("Berhasil hapus produk"),
+                          showCloseIcon: true,
+                          closeIconColor: Colors.white,
+                        ));
+                      } catch (error) {
+                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                          backgroundColor: Colors.green,
+                          content: Text("Galat hapus produk"),
+                          showCloseIcon: true,
+                          closeIconColor: Colors.white,
+                        ));
+                      } finally {
+                        setState(() {
+                          _loading = false;
+                        });
+                      }
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.red,

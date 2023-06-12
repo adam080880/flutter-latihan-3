@@ -22,23 +22,26 @@ class ProdukBloc {
   static Future addProduk({ProdukModel? produk}) async {
     String apiUrl = ApiUrl.createProduk;
     var body = {
-      "kode_produk": produk!.kodeproduk,
-      "nama_produk": produk.namaproduk,
-      "harga": produk.hargaproduk.toString()
+      "kodeproduk": produk!.kodeproduk,
+      "namaproduk": produk.namaproduk,
+      "hargaproduk": produk.hargaproduk.toString()
     };
 
     var response = await Api().post(apiUrl, body);
+
+    print('response');
+    print(response);
     var jsonObj = json.decode(response.body);
     return jsonObj['status'];
   }
 
-  static Future<bool> updateProduk({required ProdukModel produk}) async {
-    String apiUrl = ApiUrl.updateProduk(produk.id!);
+  static Future updateProduk({required ProdukModel produk}) async {
+    String apiUrl = ApiUrl.updateProduk(produk.id ?? 0);
 
     var body = {
-      "kode_produk": produk.kodeproduk,
-      "nama_produk": produk.namaproduk,
-      "harga": produk.hargaproduk.toString()
+      "kodeproduk": produk.kodeproduk,
+      "namaproduk": produk.namaproduk,
+      "hargaproduk": produk.hargaproduk.toString(),
     };
 
     var response = await Api().post(apiUrl, body);
@@ -46,7 +49,7 @@ class ProdukBloc {
     return jsonObj['data'];
   }
 
-  static Future<bool> deleteProduk({int? id}) async {
+  static Future deleteProduk({int? id}) async {
     String apiUrl = ApiUrl.deleteProduk(id!);
 
     var response = await Api().delete(apiUrl);
