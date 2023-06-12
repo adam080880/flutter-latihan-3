@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:latihan_3/bloc/registrasi_bloc.dart';
+import 'package:latihan_3/models/auth/registrasi.dart';
 import 'package:latihan_3/ui/product_list.dart';
 
 class Registrasi extends StatefulWidget {
@@ -13,6 +15,8 @@ class Registrasi extends StatefulWidget {
 
 class _RegistrasiState extends State<Registrasi> {
   bool _passwordVisible = false;
+  bool _canSubmit = true;
+
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
@@ -22,6 +26,7 @@ class _RegistrasiState extends State<Registrasi> {
   void initState() {
     super.initState();
     _passwordVisible = false;
+    _canSubmit = true;
   }
 
   @override
@@ -40,7 +45,7 @@ class _RegistrasiState extends State<Registrasi> {
               _renderEmail(),
               _renderPassword(),
               _renderButton(),
-              _renderTextToRegister(),
+              _renderTextToLogin(),
             ]
           )
         )
@@ -136,14 +141,51 @@ class _RegistrasiState extends State<Registrasi> {
         children: [
           Expanded(
             child: ElevatedButton(
-              child: const Text('Registrasi'),
-              onPressed: () => {
-                if (_formKey.currentState!.validate()) {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) => const ProductList())
-                  )
+              onPressed: !_canSubmit ? null : () async {
+                if (!_formKey.currentState!.validate()) {
+                  return;
+                }
+
+                setState(() {
+                  _canSubmit = false;
+                });
+
+                try {
+                  String nama = _nameController.text;
+                  String email = _emailController.text;
+                  String password = _passwordController.text;
+                  // run here
+                  RegistrasiModel registrasiResponse = await RegistrasiBloc.registrasi(email: email, nama: nama, password: password);
+
+                  if (registrasiResponse.status == false) {
+                    throw Exception(registrasiResponse.message);
+                  }
+
+                  if (!mounted) return;
+
+                  // if success
+                  handleNavigateToLogin();
+
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                    backgroundColor: Colors.green,
+                    content: Text("Berhasil registrasi"),
+                    showCloseIcon: true,
+                    closeIconColor: Colors.white,
+                  ));
+                } catch (err) {
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    backgroundColor: Colors.red,
+                    content: Text(err.toString()),
+                    showCloseIcon: true,
+                    closeIconColor: Colors.white,
+                  ));
+                } finally {
+                  setState(() {
+                    _canSubmit = true;
+                  });
                 }
               },
+              child: const Text('Registrasi'),
             )
           )
         ],
@@ -151,7 +193,7 @@ class _RegistrasiState extends State<Registrasi> {
     );
   }
 
-  _renderTextToRegister() {
+  _renderTextToLogin() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [

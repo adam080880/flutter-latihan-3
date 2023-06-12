@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:latihan_3/bloc/login_bloc.dart';
+import 'package:latihan_3/models/auth/login.dart';
 import 'package:latihan_3/ui/auth/registrasi.dart';
 import 'package:latihan_3/ui/product_list.dart';
 
@@ -14,6 +16,7 @@ class Login extends StatefulWidget {
 
 class _LoginState extends State<Login> {
   bool _passwordVisible = false;
+  bool _canSubmit = true;
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -22,6 +25,7 @@ class _LoginState extends State<Login> {
   void initState() {
     super.initState();
     _passwordVisible = false;
+    _canSubmit = true;
   }
 
   @override
@@ -116,11 +120,49 @@ class _LoginState extends State<Login> {
         children: [
           Expanded(
             child: ElevatedButton(
-              onPressed: () => {
-                if (_formKey.currentState!.validate()) {
+              onPressed: !_canSubmit ? null : () async {
+                if (!_formKey.currentState!.validate()) {
+                  return;
+                }
+
+                setState(() {
+                  _canSubmit = false;
+                });
+
+                try {
+                  String email = _emailController.text;
+                  String password = _passwordController.text;
+                  // run here
+                  LoginModel loginResponse = await LoginBloc.login(email: email, password: password);
+
+                  if (loginResponse.status == false) {
+                    throw Exception(loginResponse.data);
+                  }
+
+                  if (!mounted) return;
+
+                  // if success
                   Navigator.of(context).push(
                     MaterialPageRoute(builder: (context) => const ProductList())
-                  )
+                  );
+
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                    backgroundColor: Colors.green,
+                    content: Text("Berhasil login"),
+                    showCloseIcon: true,
+                    closeIconColor: Colors.white,
+                  ));
+                } catch (err) {
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    backgroundColor: Colors.red,
+                    content: Text(err.toString()),
+                    showCloseIcon: true,
+                    closeIconColor: Colors.white,
+                  ));
+                } finally {
+                  setState(() {
+                    _canSubmit = true;
+                  });
                 }
               },
               child: const Text('Login'),
