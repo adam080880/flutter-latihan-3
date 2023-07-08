@@ -14,7 +14,7 @@ class ItemProductCard extends StatelessWidget {
       child: Card(
         child: ListTile(
           title: Text(produk.namaproduk!),
-          subtitle: Text(produk.hargaproduk!.toString()),
+          subtitle: Text("Harga jual: ${produk.hargaproduk!}, Harga Beli: ${produk.hargabeliproduk}"),
         )
       )
     );

@@ -16,7 +16,9 @@ class _ProductFormState extends State<ProductForm> {
   bool _loading = false;
   final _productCodeController = TextEditingController();
   final _productNameController = TextEditingController();
+  final _productCategoryGroupController = TextEditingController();
   final _productPriceController = TextEditingController();
+  final _productPriceBuyController = TextEditingController();
 
   @override
   void initState() {
@@ -24,7 +26,9 @@ class _ProductFormState extends State<ProductForm> {
 
     _productCodeController.text = widget.product?.kodeproduk ?? '';
     _productNameController.text = widget.product?.namaproduk ?? '';
+    _productCategoryGroupController.text = widget.product?.kategorigroupproduk ?? '';
     _productPriceController.text = (widget.product?.hargaproduk?.toString() ?? '');
+    _productPriceBuyController.text = (widget.product?.hargabeliproduk?.toString() ?? '');
 
     _loading = false;
   }
@@ -41,7 +45,9 @@ class _ProductFormState extends State<ProductForm> {
             children: [
               _renderTextBoxProductCode(),
               _renderTextBoxProductName(),
+              _renderTextBoxProductCategoryGroup(),
               _renderTextBoxProductPrice(),
+              _renderTextBoxProductBuyPrice(),
               _renderSaveButton(context),
             ]
           )
@@ -65,14 +71,30 @@ class _ProductFormState extends State<ProductForm> {
         controller: _productNameController);
   }
 
+  _renderTextBoxProductCategoryGroup() {
+    return TextFormField(
+        decoration: const InputDecoration(
+            hintText: 'Ex: Dedek', labelText: 'Kategori Produk'),
+        controller: _productCategoryGroupController);
+  }
+
   _renderTextBoxProductPrice() {
+    return TextFormField(
+      decoration: const InputDecoration(
+          hintText: 'Ex: 5000', labelText: 'Harga Produk'),
+      keyboardType: TextInputType.number,
+      controller: _productPriceController,
+    );
+  }
+
+  _renderTextBoxProductBuyPrice() {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       child: TextFormField(
         decoration: const InputDecoration(
-            hintText: 'Ex: 5000', labelText: 'Harga Produk'),
+            hintText: 'Ex: 5000', labelText: 'Harga Beli Produk'),
         keyboardType: TextInputType.number,
-        controller: _productPriceController,
+        controller: _productPriceBuyController,
       )
     );
   }
@@ -116,8 +138,10 @@ class _ProductFormState extends State<ProductForm> {
       ProdukModel newProduct = ProdukModel();
       newProduct.id = widget.product?.id; // kalau proses tambah produk, nilai ini null
       newProduct.kodeproduk = _productCodeController.text;
+      newProduct.kategorigroupproduk = _productCategoryGroupController.text;
       newProduct.namaproduk = _productNameController.text;
       newProduct.hargaproduk = int.parse(_productPriceController.text);
+      newProduct.hargabeliproduk = int.parse(_productPriceController.text);
 
       try {
         if (newProduct.id == null) {

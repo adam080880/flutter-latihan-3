@@ -25,9 +25,11 @@ class _ProductDetailState extends State<ProductDetail> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Kode Produk: ${widget.produk.kodeproduk}'),
+            Text('Kode Produks: ${widget.produk.kodeproduk}'),
+            Text('Kode Produk: ${widget.produk.kategorigroupproduk}'),
             Text('Nama Produk: ${widget.produk.namaproduk}'),
             Text('Harga Produk: ${widget.produk.hargaproduk}'),
+            Text('Harga Beli Produk: ${widget.produk.hargabeliproduk}'),
             const Padding(padding: EdgeInsets.only(bottom: 8)),
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,

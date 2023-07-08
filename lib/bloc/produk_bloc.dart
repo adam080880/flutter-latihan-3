@@ -21,10 +21,13 @@ class ProdukBloc {
 
   static Future addProduk({ProdukModel? produk}) async {
     String apiUrl = ApiUrl.createProduk;
+
     var body = {
       "kodeproduk": produk!.kodeproduk,
       "namaproduk": produk.namaproduk,
-      "hargaproduk": produk.hargaproduk.toString()
+      "kategorigroupproduk": produk.kategorigroupproduk,
+      "hargaproduk": produk.hargaproduk.toString(),
+      "hargabeliproduk": produk.hargabeliproduk.toString()
     };
 
     var response = await Api().post(apiUrl, body);
@@ -39,8 +42,12 @@ class ProdukBloc {
     var body = {
       "kodeproduk": produk.kodeproduk,
       "namaproduk": produk.namaproduk,
+      "kategorigroupproduk": produk.kategorigroupproduk,
       "hargaproduk": produk.hargaproduk.toString(),
+      "hargabeliproduk": produk.hargabeliproduk.toString()
     };
+
+    print(body);
 
     var response = await Api().post(apiUrl, body);
     var jsonObj = json.decode(response.body);
